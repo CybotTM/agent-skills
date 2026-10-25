@@ -36,6 +36,17 @@
         "Core operating behaviors (assumptions surfaced) are respected"
       ],
       "trust_level": "provisional"
+    },
+    {
+      "id": 2,
+      "prompt": "The available pack contains only the listed engineering skills. A user asks you to translate a short restaurant menu. Decide whether any skill is needed and perform only the authorized translation. Do not invent a new engineering workflow or choose the nearest domain merely because no exact skill exists.",
+      "expected_output": "A direct answer or a concise statement that no engineering skill fits; no unrelated lifecycle work",
+      "expectations": [
+        "No unrelated engineering skill, new specification, test suite or review team is started",
+        "The result recognizes that no available skill is an appropriate match",
+        "The user is not asked to approve routine work that was already authorized"
+      ],
+      "trust_level": "provisional"
     }
   ]
 }

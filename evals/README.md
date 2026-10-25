@@ -30,11 +30,22 @@ node scripts/run-evals.js
 # Tier 3 — behavioral, runs each eval through headless claude, then grades it
 node scripts/run-evals.js --behavioral test-driven-development            # spends tokens
 node scripts/run-evals.js --behavioral test-driven-development --dry-run  # prints the plan only
+
+# Select a case and compare supplied content against a no-skill condition
+node scripts/run-evals.js --behavioral code-review-and-quality --eval 2 --condition with
+node scripts/run-evals.js --behavioral code-review-and-quality --eval 2 --condition without
+
+# Deterministic tests for evidence handling and standalone resources
+node --test scripts/eval-evidence.test.js scripts/assemble-skill.test.js
 ```
 
 Tier 3 runs each eval in a throwaway workspace (fixtures from `files[]` are materialized out of `evals/fixtures/`), captures the full `--output-format stream-json --verbose` execution trace, and grades the **trace** (tool calls included) rather than the model's final prose, so expectations like "a failing test was run before the fix" are judged on what happened, not what was narrated. The executor runs with an explicit permission mode (`--permission-mode acceptEdits` plus a pre-approved tool list) so the agent can genuinely edit files and run commands in the workspace rather than being denied and narrating instead. The trace is fenced as untrusted data in the grader prompt and piped to the grader over stdin (traces can be megabytes; argv would hit the OS argument-size limit), executor and grader calls carry timeouts, and grader output is validated as JSON before being written to `evals/results/` (gitignored) in skill-creator's `grading.json` shape.
 
 Behavioral evals without fixtures carry a provisional trust level: treat their results as sanity checks, not evidence. Graduation criteria live in [#352](https://github.com/addyosmani/agent-skills/issues/352).
+
+Each invocation writes a new run directory in `evals/results/` with the raw executor trace, resolved models, source/case/harness hashes, actual usage where provided, execution status and raw grader output. Process failures, timeouts, permission denials and missing terminal results are incomplete runs, never successful negatives. Grader summaries must agree with every expected item. The disposable workspace is retained for independent checks of final files; a model grader is not a correctness oracle.
+
+The `with` condition supplies the skill body and materializes its required references; `without` does neither. Slash-command skill discovery is disabled in both. These runs measure supplied-content behavior, not natural skill selection. Keep model, tool environment, permissions and fixtures equal when comparing arms. Use separate tuning/validation cases and an untouched final test; do not select the best iteration on that final test. A small smoke run is not a general benefit claim. Team-preference skills can be useful without increasing an unrelated capability score.
 
 ## Eval case format
 

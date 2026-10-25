@@ -200,6 +200,12 @@ When multiple agents or sessions are available:
 - **Must be sequential:** Database migrations, shared state changes, dependency chains
 - **Needs coordination:** Features that share an API contract (define the contract first, then parallelize)
 
+Give each delegated task its goal, raw inputs, ownership boundaries, expected output, allowed tools/actions and acceptance criteria. Do not pass an author's conclusions to an independent reviewer. Verify the host's actual child-context and permission behavior; a child cannot receive powers outside the parent's authorization.
+
+Choose review depth from the change's risks, not a fixed team size. Use one shared time/cost and correction-cycle budget for the task, including all active skills. Start with a focused check and add specialists only for independent risks. Record when existing evidence can be reused (same revision, environment and property), what a new change invalidates, and when an unresolved result must return to a person. More reviewers and more comments are not quality metrics.
+
+For changes to prompts, skills or harnesses, include a baseline comparison in the plan: old/new versions under the same actor and environment; also no-skill when claiming new capability. Keep tuning cases separate from the final test, record errors/timeouts separately, and verify actual outcomes and tool events. Team conventions can be valuable without beating the baseline model at an unrelated capability.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -227,7 +233,8 @@ Before starting implementation, confirm:
 - [ ] Task dependencies are identified and ordered correctly
 - [ ] No task touches more than ~5 files
 - [ ] Checkpoints exist between major phases
-- [ ] The human has reviewed and approved the plan
+- [ ] The plan stays within the user's authorization; unresolved decisions requiring new authorization are identified
+- [ ] Review depth, shared budget, stop conditions and reusable evidence are explicit where relevant
 
 ## See Also
 

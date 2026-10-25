@@ -57,6 +57,21 @@ npx skills add addyosmani/agent-skills --skill interview-me              # requi
 npx skills add addyosmani/agent-skills --skill test-driven-development   # red-green-refactor, enforced
 ```
 
+For a standalone copy, include the shared resources the skill names; copying only
+its directory can leave repository-root references unresolved. From a checkout:
+
+```bash
+node scripts/assemble-skill.js code-review-and-quality /tmp/review-skill-package
+```
+
+The output is a new self-contained skill directory with rewritten relative links.
+The assembler checks required shared references before writing, refuses symlinks
+and path traversal, and never overwrites an existing destination. Install that
+directory with the target agent's supported mechanism. This is packaging, not a
+claim that a remote reviewer executes skill scripts. Review-only criteria live in
+`references/code-review-policy.md`; the managed service's inclusion limits and
+policy source rules must be checked separately.
+
 Prefer a native integration? Pick your tool below.
 
 <details>

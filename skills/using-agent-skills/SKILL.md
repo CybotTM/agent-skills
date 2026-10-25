@@ -13,6 +13,8 @@ Agent Skills is a collection of engineering workflow skills organized by develop
 
 When a task arrives, identify the development phase and apply the corresponding skill:
 
+Choose the smallest set whose capabilities cover the request. The lifecycle below is a map, not a requirement to run every phase. A related keyword alone is insufficient. If no available skill fits, say what is missing and proceed with the authorized work you can do; do not substitute a neighboring domain skill. Test descriptions with realistic positive requests and nearby requests that should route elsewhere. Lexical similarity checks are routing approximations, not proof that an agent actually loads the skill.
+
 ```
 Task arrives
     │
@@ -63,10 +65,10 @@ Don't silently fill in ambiguous requirements. The most common failure mode is m
 
 When you encounter inconsistencies, conflicting requirements, or unclear specifications:
 
-1. **STOP.** Do not proceed with a guess.
-2. Name the specific confusion.
-3. Present the tradeoff or ask the clarifying question.
-4. Wait for resolution before continuing.
+1. Check the task, existing code and recorded decisions for a resolution.
+2. For a routine reversible choice within scope, decide and state any material assumption.
+3. Ask when the unresolved choice changes requirements, risk, cost or external effects.
+4. Wait only on work that depends on the answer; continue independent authorized work. Preserve authorization already given for the same action and scope.
 
 **Bad:** Silently picking one interpretation and hoping it's right.
 **Good:** "I see X in the spec but Y in the existing code. Which takes precedence?"
@@ -101,7 +103,7 @@ Do NOT:
 - Remove comments you don't understand
 - "Clean up" code orthogonal to the task
 - Refactor adjacent systems as a side effect
-- Delete code that seems unused without explicit approval
+- Delete code whose purpose or removal is outside the authorized scope; verify suspected dead code before changing it
 - Add features not in the spec because they "seem useful"
 
 Your job is surgical precision, not unsolicited renovation.
@@ -111,6 +113,14 @@ Your job is surgical precision, not unsolicited renovation.
 Every skill includes a verification step. A task is not complete until verification passes. "Seems right" is never sufficient — there must be evidence (passing tests, build output, runtime data).
 
 Per-skill verification is the local check. The project-wide bar that applies to *every* change, regardless of which skill is active, is the Definition of Done: tests pass, no regressions, behavior verified at runtime, docs updated. See `references/definition-of-done.md`. It complements each task's acceptance criteria rather than replacing them.
+
+Bind each check to its input revision or hash, environment and claimed property. Keep successful verification, a confirmed defect, a skipped check and an incomplete run distinct. A missing tool, timeout or absent result is not a pass. A review that confirms no defects is a valid result; it does not prove error-free code or grant merge permission.
+
+### 7. Share Review Work and Boundaries
+
+Use one task-level review plan and budget across all active skills. Reuse matching evidence rather than starting the same review again for each skill. Start with a focused reviewer; add independent specialists only for distinct risks or genuinely parallel work. Keep discovery and candidate validation separate, include counterevidence, and cap correction/review cycles (three is a starting default). On reaching the cap, report unresolved findings instead of declaring success. After the first full review, inspect the delta and affected contracts, retain stable finding IDs and avoid repeating resolved findings.
+
+Check whether the host supports the selected tools, child context and skill-loading mechanism. Text included in a remote reviewer is not proof that a skill or its scripts executed. Use current capabilities rather than assuming a particular agent API or fixed number of reviewers. The user remains responsible for authorized external actions; an agent's review or delegation does not create permission to send, publish, merge or incur new costs.
 
 ## Failure Modes to Avoid
 
@@ -131,11 +141,11 @@ These are the subtle errors that look like productivity but create problems:
 
 1. **Check for an applicable skill before starting work.** Skills encode processes that prevent common mistakes.
 
-2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
+2. **Follow the relevant workflow within the task's scope and host capabilities.** Preserve verification and authorization requirements; do not turn an example or optional mode into extra mandatory work.
 
 3. **Multiple skills can apply.** A feature implementation might involve `idea-refine` → `spec-driven-development` → `planning-and-task-breakdown` → `incremental-implementation` → `test-driven-development` → `code-review-and-quality` → `code-simplification` → `shipping-and-launch` in sequence.
 
-4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with `spec-driven-development`.
+4. **Clarify requirements when they are missing.** Reuse an accepted specification or a concrete approved change proposal. A small, clear task does not need a new specification ceremony.
 
 ## Lifecycle Sequence
 
