@@ -218,6 +218,16 @@ When multiple agents or sessions are available:
 - **Must be sequential:** Database migrations, shared state changes, dependency chains
 - **Needs coordination:** Features that share an API contract (define the contract first, then parallelize)
 
+For each delegated task, record the owner, goal, input revision, files in scope, permitted actions, dependencies, expected artifact, and acceptance check. Keep those actions within the task's existing authorization; delegation does not expand publication or merge rights or remove a human checkpoint.
+
+### Review and Evaluation Budgets
+
+Choose review questions and a shared time or round budget from the task's risks. Count work already spent across agents and skills toward that budget, and record what to do when it is exhausted. Loading another skill does not start a new allowance.
+
+Reuse a recorded check only for the same revision and property it actually checked. Plan a focused recheck when affected code or assumptions change; a timeout, denied action, or skipped check leaves coverage incomplete.
+
+When the task changes a skill or agent harness, plan a matched before/after comparison: use the same cases and hold the model, effort, tools, and permissions constant except for the intended change, with independent checks of actual outcomes. Reserve separate final cases from those used to tune the change. Record these checks as acceptance tasks; writing the plan does not establish that the change improves results.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |

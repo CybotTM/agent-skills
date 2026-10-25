@@ -40,6 +40,22 @@
         "Tasks are vertical slices rather than horizontal layers",
         "No implementation code is written during planning"
       ]
+    },
+    {
+      "id": 2,
+      "prompt": "Read the attached review-guidance comparison brief and write the implementation plan and task list. Plan the delegated work and its acceptance checks; do not run the comparison or implement the guidance change.",
+      "expected_output": "A plan and task list with bounded delegation, the existing exhausted review budget, revision-scoped evidence reuse, a matched comparison and separate final cases",
+      "files": [
+        "planning-review-budget"
+      ],
+      "expectations": [
+        "The plan gives each proposed worker a goal, input revision, file scope, permitted actions, expected artifact and acceptance check, without granting publication or merge rights",
+        "The existing two-round task budget remains exhausted across the loaded skills; the plan preserves the disputed candidate rather than scheduling two more identical rounds",
+        "The passing v2 retry check is reused only for the same revision and retry property, with authorization coverage still unverified",
+        "The comparison uses the same cases, model, effort, tools and permissions in both arms and independently verifies actual outcomes instead of accepting tool-use claims",
+        "Final evaluation cases are reserved separately from cases used while tuning the guidance",
+        "The plan and task list preserve the human approval checkpoint, and no implementation or comparison run occurs during planning"
+      ]
     }
   ]
 }
