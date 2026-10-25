@@ -38,6 +38,24 @@
         "No secrets are hardcoded in the workflow"
       ],
       "trust_level": "provisional"
+    },
+    {
+      "id": 2,
+      "prompt": "In the local ci-runtime-parity fixture, verification on Node 24 is green but publication fails before the build. Find and minimally fix the workflow runtime mismatch, then perform a locked install and production build under the effective deployment runtime and record the version. Work only in this fixture: do not contact or publish to services, create pull requests, change repository settings, or add unrelated pipeline gates. Preserve the engine constraint and lockfile requirements. A deliberately compatible runtime matrix is allowed.",
+      "expected_output": "An effective-runtime trace through the reusable workflow input/default, a minimal compatible correction and an observed locked install plus build under the deployment runtime.",
+      "files": [
+        "ci-runtime-parity/.github/workflows/ci.yml",
+        "ci-runtime-parity/.github/workflows/publish.yml",
+        "ci-runtime-parity/check-runtime.cjs",
+        "ci-runtime-parity/package-lock.json",
+        "ci-runtime-parity/package.json"
+      ],
+      "expectations": [
+        "Reads the caller, reusable workflow input/default and the project engine constraint; identifies the omitted input resolving publication to 22.23.3 below >=22.23.4 despite green Node 24 verification.",
+        "Corrects the effective deployment runtime to satisfy the full engine boundary without weakening the engine constraint or treating a common major version as sufficient.",
+        "Demonstrates npm ci and npm run build under the selected deployment runtime and records its actual version; Node 24 verification alone is not accepted as a publication witness.",
+        "Keeps changes local and focused, preserves a deliberately compatible runtime matrix if chosen, and performs no external publication or repository mutation."
+      ]
     }
   ]
 }

@@ -387,4 +387,6 @@ After setting up or modifying CI:
 - [ ] CI results feed back into the development loop
 - [ ] Secrets are stored in the secrets manager, not in code
 - [ ] Deployment has a rollback mechanism
+- [ ] Resolve the effective runtime for every install/build path, including preview and production deployment, reusable-workflow inputs, action defaults and container images. Check it against the project's declared runtime and the engines required by the locked dependencies; a shared major version alone is not sufficient.
+- [ ] Run the locked install and production build with the deployment runtime and record the effective versions. Prefer one project-owned runtime declaration for test/build/deploy. A deliberate runtime matrix must include the selected deployment runtime; a green run on another runtime does not establish deployability.
 - [ ] Pipeline runs in under 10 minutes for the test suite
