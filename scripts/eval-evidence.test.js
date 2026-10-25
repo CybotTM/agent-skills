@@ -31,11 +31,43 @@ test('permission denials stay blocked even when the process returns success', ()
 test('real tool events and actual resolved models are retained', () => {
   const r = inspectExecution(trace(
     { type: 'assistant', message: { model: 'example-model', content: [{ type: 'tool_use', name: 'Read', id: '1', input: { file_path: '/src/a' } }] } },
+    { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: '1', content: 'source contents' }] } },
     { type: 'result', subtype: 'success', is_error: false, total_cost_usd: 0.02 },
   ));
   assert.equal(r.tool_calls, 1);
   assert.deepEqual(r.models, ['example-model']);
   assert.equal(r.total_cost_usd, 0.02);
+});
+
+test('an old terminal result cannot complete a later unfinished turn', () => {
+  assert.equal(inspectExecution(trace(
+    { type: 'result', subtype: 'success', is_error: false },
+    { type: 'assistant', message: { content: [{ type: 'text', text: 'starting another turn' }] } },
+  )).status, 'error');
+});
+
+test('open and unmatched tool observations cannot be graded as complete', () => {
+  const call = { type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Read', id: '1', input: {} }] } };
+  const terminal = { type: 'result', subtype: 'success', is_error: false };
+  assert.equal(inspectExecution(trace(call, terminal)).status, 'error');
+  assert.equal(inspectExecution(trace(
+    { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'missing', content: 'unknown' }] } }, terminal)).status, 'error');
+});
+
+test('a completed RED fix GREEN task retains failed probes for semantic grading', () => {
+  const call = (id, name) => ({ type: 'assistant', message: { content: [{ type: 'tool_use', name, id, input: {} }] } });
+  const returned = (id, is_error) => ({ type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: id, is_error }] } });
+  const result = inspectExecution(trace(call('red', 'Bash'), returned('red', true),
+    call('fix', 'Edit'), returned('fix', false), call('green', 'Bash'), returned('green', false),
+    { type: 'result', subtype: 'success', is_error: false }));
+  assert.equal(result.status, 'completed');
+  assert.equal(result.tool_error_count, 1);
+  assert.equal(result.tool_calls, 3);
+});
+
+test('malformed event and grading entries are rejected without crashing', () => {
+  assert.equal(inspectExecution('null').status, 'error');
+  assert.equal(parseGrading(JSON.stringify({ expectations: [null], summary: { passed: 1, failed: 0, total: 1, pass_rate: 1 } }), ['one']), null);
 });
 
 test('a grader cannot pass by omitting failed expectations or inventing its total', () => {

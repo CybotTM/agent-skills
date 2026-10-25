@@ -3,6 +3,27 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
+function traceFault(events) {
+  const conversation = events.filter((event) => ['assistant', 'user', 'result'].includes(event.type));
+  if (conversation.at(-1)?.type !== 'result') return 'missing final conversation result';
+  const pending = new Set();
+  for (const event of conversation) {
+    const content = event.message?.content;
+    if (!Array.isArray(content)) continue;
+    for (const item of content) {
+      if (!item || typeof item !== 'object') return 'invalid message content';
+      if (event.type === 'assistant' && item.type === 'tool_use') {
+        if (typeof item.id !== 'string' || !item.id || pending.has(item.id)) return 'invalid tool call';
+        pending.add(item.id);
+      }
+      if (event.type === 'user' && item.type === 'tool_result') {
+        if (!pending.delete(item.tool_use_id)) return 'unmatched tool observation';
+      }
+    }
+  }
+  return pending.size ? 'missing tool observation' : null;
+}
+
 function inspectExecution(trace, error) {
   let events;
   try {
@@ -10,10 +31,16 @@ function inspectExecution(trace, error) {
   } catch {
     return { status: error?.code === 'ETIMEDOUT' ? 'timeout' : 'error', reason: 'invalid execution trace' };
   }
+  if (events.some((event) => !event || typeof event !== 'object' || Array.isArray(event))) {
+    return { status: 'error', reason: 'invalid execution event' };
+  }
   const result = events.findLast((event) => event.type === 'result');
   const messages = events.filter((event) => event.type === 'assistant').map((event) => event.message || {});
   const observed = {
-    tool_calls: messages.flatMap((message) => message.content || []).filter((item) => item.type === 'tool_use').length,
+    tool_calls: messages.flatMap((message) => message.content || []).filter((item) => item?.type === 'tool_use').length,
+    tool_error_count: events.filter((event) => event.type === 'user')
+      .flatMap((event) => event.message?.content || [])
+      .filter((item) => item?.type === 'tool_result' && item.is_error).length,
     models: [...new Set(messages.map((message) => message.model).filter(Boolean))],
     usage: result?.usage || null,
     total_cost_usd: result?.total_cost_usd ?? null,
@@ -25,6 +52,8 @@ function inspectExecution(trace, error) {
     return { ...observed, status: 'error', reason: result?.subtype || 'missing terminal result' };
   }
   if (result.permission_denials?.length) return { ...observed, status: 'blocked', reason: 'permission denied' };
+  const fault = traceFault(events);
+  if (fault) return { ...observed, status: 'error', reason: fault };
   return { ...observed, status: 'completed' };
 }
 
@@ -36,7 +65,7 @@ function parseGrading(raw, expectations) {
   let grade;
   try { grade = JSON.parse(match[0]); } catch { return null; }
   if (!Array.isArray(grade.expectations) || grade.expectations.length !== expectedCount ||
-      !grade.expectations.every((e) => expectations.includes(e.text) && typeof e.passed === 'boolean' &&
+      !grade.expectations.every((e) => e && expectations.includes(e.text) && typeof e.passed === 'boolean' &&
         typeof e.evidence === 'string' && e.evidence.trim()) ||
       new Set(grade.expectations.map((e) => e.text)).size !== expectedCount) return null;
   const passed = grade.expectations.filter((e) => e.passed).length;

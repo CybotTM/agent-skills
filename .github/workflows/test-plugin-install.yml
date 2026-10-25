@@ -23,6 +23,9 @@ jobs:
       - name: Run skill evals (trigger + routing)
         run: node scripts/run-evals.js
 
+      - name: Test evaluation evidence and skill packaging
+        run: node --test scripts/assemble-skill.test.js scripts/eval-evidence.test.js
+
   validate-commands:
     name: Validate command parity and description sync
     runs-on: ubuntu-latest
