@@ -39,6 +39,19 @@
         "The rationale references the routing logic rather than guessing",
         "Core operating behaviors (assumptions surfaced) are respected"
       ]
+    },
+    {
+      "id": 2,
+      "prompt": "Read skill-fit/menu.txt and write its English translation to translation.txt. This is a menu translation, not a software task. Leave the original menu unchanged.",
+      "expected_output": "An English translation of the three menu items, with no unrelated engineering workflow.",
+      "files": [
+        "skill-fit"
+      ],
+      "expectations": [
+        "translation.txt correctly translates tomato soup, bread with butter and apple cake.",
+        "No unrelated engineering skill, software specification, implementation plan or code review is invoked or produced for the translation.",
+        "The original menu remains unchanged; the agent performs the already authorized translation without requesting unnecessary permission."
+      ]
     }
   ]
 }

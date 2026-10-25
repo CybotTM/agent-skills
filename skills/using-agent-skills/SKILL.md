@@ -42,6 +42,8 @@ Task arrives
     └── Deploying/launching? ─────────→ shipping-and-launch
 ```
 
+Choose the smallest set of skills whose triggers fit the requested work. If none fits, handle the request directly instead of substituting a neighboring engineering workflow. A simple translation does not need a software spec or code review. Moving between skills retains the task's existing scope, permissions and verification limits; loading another skill does not expand them.
+
 ## Core Operating Behaviors
 
 These behaviors apply at all times, across all skills. They are non-negotiable.
