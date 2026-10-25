@@ -21,7 +21,8 @@
         "owner": "debugging-and-error-recovery"
       },
       {
-        "prompt": "Encode the output so it is safe against XSS"
+        "prompt": "Encode the output so it is safe against XSS",
+        "owner": "security-and-hardening"
       }
     ]
   },
@@ -30,28 +31,14 @@
       "id": 1,
       "prompt": "Break the attached notifications spec into an executable plan.",
       "expected_output": "Ordered tasks in tasks/plan.md, each small, verifiable, with acceptance criteria and dependencies",
+      "files": [
+        "planning-and-task-breakdown"
+      ],
       "expectations": [
         "Every task has acceptance criteria",
         "Tasks are ordered by dependency",
         "Tasks are vertical slices rather than horizontal layers",
         "No implementation code is written during planning"
-      ],
-      "trust_level": "provisional"
-    },
-    {
-      "id": 2,
-      "prompt": "Produce the implementation plan and task list requested in planning-budget/request.md. Keep this a planning task within the existing authorization.",
-      "files": [
-        "planning-budget/request.md"
-      ],
-      "expected_output": "A small ordered plan with a shared contract, focused review, shared budget and observable acceptance criteria",
-      "expectations": [
-        "The plan and task list are actually written; application implementation and deployment are not performed",
-        "The common balance contract precedes parallel module work",
-        "Delegated tasks identify their goal, ownership, allowed actions and acceptance evidence",
-        "Review depth follows the actual risk rather than requiring a fixed number of agents",
-        "One shared budget and stop condition cover active workflows; new source changes invalidate affected earlier checks",
-        "The task continues without requesting authorization already granted for writing the plan"
       ]
     }
   ]
