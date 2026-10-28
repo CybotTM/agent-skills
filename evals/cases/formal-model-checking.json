@@ -1,0 +1,51 @@
+{
+  "skill_name": "formal-model-checking",
+  "trigger": {
+    "positive": [
+      {
+        "prompt": "Model our secret write and audit trail to check whether a crashed worker or two competing requests can leave an unlogged change.",
+        "top_k": 1
+      },
+      {
+        "prompt": "Use a model checker to examine the retry protocol. I need every persisted payment to have a matching ledger entry.",
+        "top_k": 1
+      },
+      {
+        "prompt": "Our TLA+ check is green, but is the invariant only true because no request can complete? Investigate the model and give me a real counterexample if the protocol is broken.",
+        "top_k": 1
+      }
+    ],
+    "negative": [
+      {
+        "prompt": "Add regression tests for the rounding helper; write the failing case before changing it.",
+        "owner": "test-driven-development"
+      },
+      {
+        "prompt": "The nightly build started failing with ModuleNotFoundError. Find what changed and fix the cause.",
+        "owner": "debugging-and-error-recovery"
+      },
+      {
+        "prompt": "Can you review the changes another model just wrote for me?",
+        "owner": "code-review-and-quality"
+      }
+    ]
+  },
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The settings service promises that every saved version has an audit record. Our checker is green, but operations reported a worker dying during a save. Assess that guarantee against this project, correct the design and implementation if needed, and leave reproducible evidence and a short account of what is and is not established.",
+      "expected_output": "A bounded state model that respects the real persistence steps, an intended-invariant counterexample for the unsafe protocol, reachable success and crash paths, a verified SQLite repair, and a report distinguishing model results from implementation evidence.",
+      "files": [
+        "formal-model-checking"
+      ],
+      "expectations": [
+        "The initial green checker is executed and its abstraction is checked against store.py; the agent identifies that a successful request is bundled into one model step while the actual version and audit inserts commit separately.",
+        "The checked property covers every historical committed version, including an earlier unaudited version after a later audited write; checking only the latest value is explicitly rejected or demonstrated insufficient.",
+        "The revised finite model separates meaningful persistence steps, explores competing requests and process loss, declares its bounds and assumptions, and finishes its reachable-state search; successful operations and important crash paths are shown reachable rather than excluded by constraints.",
+        "An unsafe variant produces a counterexample to the intended audit invariant with an interpretable trace. Syntax errors, exceptions, timeouts and violations of unrelated properties do not count as this negative control.",
+        "The implementation regression is observed before the fix and the real SQLite tests pass after it. The process-loss test uses a separate worker that reaches the version-written marker before being killed; an exception that executes finally, a failed bootstrap, or mocked begin/commit calls is not presented as equivalent evidence.",
+        "The model transitions are mapped to the actual connection and transaction boundary, and the final report separates the bounded model result, runtime evidence and excluded cases; it does not claim a formal proof or equivalence verification of the Python implementation."
+      ]
+    }
+  ]
+}
