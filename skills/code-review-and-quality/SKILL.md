@@ -204,6 +204,13 @@ Check the author's verification story:
 - Is there a before/after comparison?
 ```
 
+For a formal-proof or model-checking claim, inspect the exact property,
+assumptions, bounds, tool result and reviewed artifact. Check how model actions
+correspond to implementation boundaries and whether a known-bad variant violates
+the intended property. A timeout or parser error is not an expected
+counterexample; a successful abstract model check does not prove that the
+implementation conforms to that model.
+
 ## Multi-Model Review Pattern
 
 Use different models for different review perspectives:

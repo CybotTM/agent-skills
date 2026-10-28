@@ -44,6 +44,23 @@
         "Security of user input is explicitly considered for the new endpoint",
         "The review leads with high-leverage findings rather than nits"
       ]
+    },
+    {
+      "id": 2,
+      "kind": "execution",
+      "prompt": "Review the release-verification claim in code-review-formal-evidence/CLAIM.md against its implementation and local model checks. Reproduce the available commands and deliver severity-labelled findings with file:line references and a merge recommendation. This is a review: do not fix files or publish anything.",
+      "expected_output": "An evidence-backed review distinguishing a bounded abstract model result, an invalid negative control, and the independently committed implementation writes; no claim that the production writer has been proved correct",
+      "files": [
+        "code-review-formal-evidence"
+      ],
+      "expectations": [
+        "The review identifies the exact SettledAudit property and the checked bounds of one writer and one write; it does not extend that result to concurrent production requests, retries or restarts.",
+        "The agent reproduces the green CI wrapper and inspects the negative run: exit 75 is an invalid model input with no violating trace, not a successful known-bad counterexample.",
+        "The agent runs the valid split model and identifies its SettledAudit violation with a reachable trace ending in a crashed state with secret=1 and audit=0.",
+        "The review maps the abstract atomic transition to writer.cjs, identifies the separate durable writeSecret and appendAudit calls, and explains why process loss between them bypasses catch-based compensation.",
+        "The review distinguishes the printed model artifact digest from evidence binding the implementation or production revision, and does not claim that an abstract model check proves implementation conformance.",
+        "The result provides actionable severity-labelled findings and a merge recommendation grounded in the failed verification claim; it does not modify the writer, checker or CI wrapper."
+      ]
     }
   ]
 }
