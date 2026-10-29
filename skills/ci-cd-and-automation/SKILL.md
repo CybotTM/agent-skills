@@ -311,25 +311,52 @@ Designate someone responsible for keeping CI green. When the build breaks, the B
 
 ## CI Optimization
 
-When the pipeline exceeds 10 minutes, apply these strategies in order of impact:
+Before changing a slow pipeline, record the checks it must preserve: supported
+runtime combinations, resolved dependencies, test selection and isolation,
+coverage and mutation thresholds, timeouts, failure propagation, reports, and
+required check names. A faster run must still enforce this contract.
+
+Measure the critical path before choosing an optimization. Separate dependency
+installation and test execution from dependency waits and runner acquisition.
+Count assigned jobs across the shared runner pool, including other repositories;
+workflow-file counts and queued-job counts alone do not measure ready work or
+available capacity. More parallel jobs can increase waiting at the shared limit.
+
+Choose a change that addresses the measured bottleneck:
 
 ```
 Slow CI pipeline?
 ├── Cache dependencies
 │   └── Use the setup-node cache option (or actions/cache) for the package manager cache, not node_modules
 ├── Run jobs in parallel
-│   └── Split lint, typecheck, test, build into separate parallel jobs
+│   └── Split independent work when runner capacity permits
+├── Consolidate repeated setup
+│   └── Prove dependency, runtime, and result equivalence before sharing it
 ├── Only run what changed
-│   └── Use path filters to skip unrelated jobs (e.g., skip e2e for docs-only PRs)
+│   └── Prove excluded changes cannot affect a check; preserve required-check reporting
 ├── Use matrix builds
-│   └── Shard test suites across multiple runners
+│   └── Shard within capacity while retaining every supported combination
 ├── Optimize the test suite
-│   └── Remove slow tests from the critical path, run them on a schedule instead
+│   └── Remove redundant setup or contention while retaining required tests before merge
 └── Use larger runners
     └── GitHub-hosted larger runners or self-hosted for CPU-heavy builds
 ```
 
-**Example: caching and parallelism**
+For example, an analyzer job that pins PHPUnit below 13 and a test job that
+allows PHPUnit 13 do not have equivalent dependency installations. Sharing the
+analyzer's vendor directory would silently narrow the test coverage. Keep
+separate manifests, lockfiles, vendor directories, and cache identities when
+resolutions differ, even if the phases share a runner. Verify extensions,
+services, environment, failure handling, timeout budgets, and separate reports
+as well; a common source revision alone does not prove equivalence.
+
+Compare the original and candidate at the same source revision with recorded
+dependency and runtime identities. Check every required result and artifact,
+including failure and retry paths, then measure runner time and elapsed time.
+Keep the original path when equivalence is unproven. Moving a required test to a
+schedule changes the quality contract and is not a performance optimization.
+
+**Example: caching and parallelism when runner capacity permits**
 ```yaml
 jobs:
   lint:
@@ -390,4 +417,5 @@ After setting up or modifying CI:
 - [ ] CI results feed back into the development loop
 - [ ] Secrets are stored in the secrets manager, not in code
 - [ ] Deployment has a rollback mechanism
-- [ ] Pipeline runs in under 10 minutes for the test suite
+- [ ] Pipeline timing meets the measured target while retaining every required gate
+- [ ] Optimization preserves the recorded quality contract and reports measured timing with its scope

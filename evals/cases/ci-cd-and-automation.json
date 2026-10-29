@@ -40,6 +40,23 @@
         "Steps are ordered logically and cache or setup steps are sane",
         "No secrets are hardcoded in the workflow"
       ]
+    },
+    {
+      "id": 2,
+      "kind": "execution",
+      "prompt": "Read brief.md and write PLAN.md with a concrete plan to reduce PR completion time without weakening checks. Evaluate all four shortcuts and the lint consolidation control. Separate facts from measurements still needed; do not change workflows yet.",
+      "expected_output": "A capacity-aware plan preserving the quality contract, rejecting incompatible dependency reuse and scheduled required tests, with equivalence and timing acceptance criteria for safe consolidation",
+      "files": [
+        "ci-quality-contract/brief.md"
+      ],
+      "expectations": [
+        "Records all eight supported runtime/test/analyzer combinations, test selection and isolation, thresholds, separate reports, failure handling, timeout budgets, and required check names as preserved acceptance criteria",
+        "Rejects using the analyzer vendor directory for the test phase because the PHPUnit constraint changes dependency coverage, and retains isolated installs when sharing a runner",
+        "Rejects moving the required security suite to nightly and does not blindly double matrix fanout without dependency readiness and effective shared-capacity evidence",
+        "Treats 17 workflow files and queued records as insufficient to determine runnable demand or available capacity",
+        "Considers the equivalent lint consolidation a valid candidate and requires checking failure and timeout behavior, both reports and required-check compatibility rather than rejecting all consolidation",
+        "Plans a same-source comparison with recorded package/runtime identities and every required result and artifact, distinguishing runner time from elapsed time and retry cost, without claiming unmeasured speed gains"
+      ]
     }
   ]
 }
