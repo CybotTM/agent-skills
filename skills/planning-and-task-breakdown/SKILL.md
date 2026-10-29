@@ -218,6 +218,13 @@ When multiple agents or sessions are available:
 - **Must be sequential:** Database migrations, shared state changes, dependency chains
 - **Needs coordination:** Features that share an API contract (define the contract first, then parallelize)
 
+Before following up with an existing worker, refresh its status and assignment;
+record the next permitted action in the plan. For a completed or idle worker,
+new work needs the host's documented task dispatch or resume operation: a message
+delivery receipt alone does not show that execution started. For a running
+worker whose assignment already covers the requested work, send only the
+clarification and wait for its result; do not dispatch a duplicate assignment.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |

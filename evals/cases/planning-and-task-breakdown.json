@@ -40,6 +40,39 @@
         "Tasks are vertical slices rather than horizontal layers",
         "No implementation code is written during planning"
       ]
+    },
+    {
+      "id": 2,
+      "prompt": "Read worker-lifecycle/INTERFACE.md and worker-lifecycle/completed.md. Write the requested plan and task list without executing worker operations or changing the supplied fixtures.",
+      "expected_output": "A plan that refreshes status, dispatches new version-2 assignments to the completed and idle workers, and verifies actual execution rather than accepting the earlier delivery receipt.",
+      "files": [
+        "worker-lifecycle/INTERFACE.md",
+        "worker-lifecycle/completed.md"
+      ],
+      "expectations": [
+        "The plan records reviewer-a as completed after version 1 and reviewer-b as idle with no assignment; neither is falsely described as running version 2",
+        "The next permitted execution step uses inspect and then dispatch for each eligible worker, rather than another message-only continuation",
+        "The earlier delivered message is not counted as a started task or completed review",
+        "Acceptance requires evidence that the version-2 assignments actually started and produced the requested review artifacts",
+        "The plan rechecks status and assignment before execution, preserves the supplied file scope, and does not grant publication or merge rights",
+        "The trace creates tasks/plan.md and tasks/todo.md but performs no worker operations and leaves the fixture files unchanged"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Read worker-lifecycle/INTERFACE.md and worker-lifecycle/running.md. Write the requested plan and task list without executing worker operations or changing the supplied fixtures.",
+      "expected_output": "A plan that refreshes the running worker's existing version-2 assignment, sends the clarification with message, and waits for that result without dispatching duplicate work.",
+      "files": [
+        "worker-lifecycle/INTERFACE.md",
+        "worker-lifecycle/running.md"
+      ],
+      "expectations": [
+        "The plan records reviewer-a as running an assignment that already covers the requested version-2 review",
+        "The next permitted operations are to inspect current status and assignment, send the clarification using message, and wait for the existing result",
+        "The plan does not dispatch the same assignment again or start a replacement reviewer merely because a clarification was needed",
+        "A delivered message is not described as proof that the clarification was applied or the review finished; acceptance checks the returned artifact",
+        "The trace creates tasks/plan.md and tasks/todo.md without executing worker operations, writing implementation code or modifying fixture files"
+      ]
     }
   ]
 }
